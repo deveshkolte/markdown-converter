@@ -1,0 +1,9 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+python-multipart>=0.0.18
+httpx>=0.27
+
+# Install the local markdown_converter package (editable)
+# Run `pip install -r api/requirements.txt` from the repo root
+# (where pyproject.toml lives) so that `-e .` resolves correctly.
+-e .
