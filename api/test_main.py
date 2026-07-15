@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from main import ALLOWED_EXTENSIONS, MAX_FILE_SIZE, app
+from main import MAX_FILE_SIZE, app
 
 client = TestClient(app)
 
@@ -34,7 +34,10 @@ def test_convert_invalid_extension(tmp_path: Path):
     exe = tmp_path / "test.exe"
     exe.write_text("nonsense")
     with open(exe, "rb") as f:
-        response = client.post("/convert", files={"file": ("test.exe", f, "application/octet-stream")})
+        response = client.post(
+            "/convert",
+            files={"file": ("test.exe", f, "application/octet-stream")},
+        )
     assert response.status_code == 400
     data = response.json()
     assert "unsupported" in data["detail"].lower()
@@ -64,7 +67,7 @@ def test_convert_conversion_failure(monkeypatch, tmp_path):
 
     monkeypatch.setattr(tempfile, "NamedTemporaryFile", tracking_ntf)
 
-    def failing_convert(path):
+    def failing_convert(_path):
         raise RuntimeError("Simulated conversion failure")
 
     monkeypatch.setattr(main, "convert", failing_convert)
