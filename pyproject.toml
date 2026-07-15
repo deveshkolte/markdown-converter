@@ -43,6 +43,9 @@ dev = [
     "ruff>=0.5",
     "black>=24.0",
     "pre-commit>=3.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "python-multipart>=0.0.18",
 ]
 rag = [
     "chromadb>=0.5",

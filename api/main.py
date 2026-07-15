@@ -26,12 +26,9 @@ ALLOWED_EXTENSIONS = {
 MAX_FILE_SIZE = 50 * 1024 * 1024
 
 origins_str = os.environ.get("ALLOWED_ORIGINS")
-if origins_str:
-    origins = [o.strip() for o in origins_str.split(",") if o.strip()]
-else:
-    # Default to allow all origins for local dev.
-    # TODO: Lock down to the real frontend domain before going live.
-    origins = ["*"]
+# Default to allow all origins for local dev.
+# TODO: Lock down to the real frontend domain before going live.
+origins = [o.strip() for o in origins_str.split(",") if o.strip()] if origins_str else ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -48,7 +45,7 @@ async def health():
 
 
 @app.post("/convert")
-async def convert_endpoint(file: UploadFile = File(...)):
+async def convert_endpoint(file: UploadFile = File(...)):  # noqa: B008
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file provided")
 
@@ -56,7 +53,10 @@ async def convert_endpoint(file: UploadFile = File(...)):
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type: {ext}. Supported: {', '.join(sorted(ALLOWED_EXTENSIONS))}",
+            detail=(
+                f"Unsupported file type: {ext}."
+                f" Supported: {', '.join(sorted(ALLOWED_EXTENSIONS))}"
+            ),
         )
 
     contents = await file.read()
