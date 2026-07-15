@@ -2,6 +2,7 @@ from pathlib import Path
 
 from markitdown import MarkItDown
 
+from .formatting import clean_markdown
 from .logger import get_logger
 
 _converter: MarkItDown | None = None
@@ -38,5 +39,7 @@ def convert(input_path: str | Path) -> str:
 
     result = md.convert(str(path.resolve()))
 
-    logger.info("Converted %s (%d chars)", path.name, len(result.text_content))
-    return result.text_content
+    markdown = result.text_content
+    markdown = clean_markdown(markdown)
+    logger.info("Converted %s (%d chars)", path.name, len(markdown))
+    return markdown
