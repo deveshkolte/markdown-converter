@@ -14,7 +14,6 @@ ChromaDB is chosen because:
 from __future__ import annotations
 
 import os
-from pathlib import Path
 from typing import Any
 
 from .logger import get_logger
@@ -34,15 +33,11 @@ def _get_client(persist_dir: str | None = None) -> Any:
     try:
         import chromadb
 
-        persist = persist_dir or os.path.join(
-            os.path.dirname(__file__), "..", ".chromadb"
-        )
+        persist = persist_dir or os.path.join(os.path.dirname(__file__), "..", ".chromadb")
         _client = chromadb.PersistentClient(path=persist)
         logger.debug("ChromaDB client initialised (persist at %s)", persist)
     except ImportError:
-        logger.warning(
-            "chromadb not installed. Install with: pip install markdown-converter[rag]"
-        )
+        logger.warning("chromadb not installed. Install with: pip install markdown-converter[rag]")
         _client = None
 
     return _client
@@ -96,10 +91,7 @@ def add_document(
 
     ids = [f"{doc_id}__{c['id']}" for c in chunks]
     texts = [c["text"] for c in chunks]
-    metadatas = [
-        {**c.get("metadata", {}), "doc_id": doc_id, "chunk_id": c["id"]}
-        for c in chunks
-    ]
+    metadatas = [{**c.get("metadata", {}), "doc_id": doc_id, "chunk_id": c["id"]} for c in chunks]
 
     # ChromaDB handles embedding automatically via the collection's embedding function
     coll.add(ids=ids, documents=texts, metadatas=metadatas)

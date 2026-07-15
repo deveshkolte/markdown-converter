@@ -18,9 +18,10 @@ import functools
 import hashlib
 import os
 import time
+from collections.abc import Callable
 from concurrent.futures import Future, ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Any, Callable, TypeVar
+from typing import Any, TypeVar
 
 from .logger import get_logger
 
@@ -102,9 +103,7 @@ def convert_many_threaded(
     errors: list[tuple[Path, Exception]] = []
 
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
-        fut: dict[Future, Path] = {
-            pool.submit(_convert_safe, p): p for p in paths
-        }
+        fut: dict[Future, Path] = {pool.submit(_convert_safe, p): p for p in paths}
 
         for future in as_completed(fut):
             p = fut[future]
@@ -142,9 +141,7 @@ def convert_many_parallel(
     results: dict[Path, str] = {}
 
     with ProcessPoolExecutor(max_workers=max_workers) as pool:
-        fut: dict[Future, Path] = {
-            pool.submit(_convert_safe, p): p for p in paths
-        }
+        fut: dict[Future, Path] = {pool.submit(_convert_safe, p): p for p in paths}
 
         for future in as_completed(fut):
             p = fut[future]
@@ -204,8 +201,6 @@ def benchmark_conversion(
         results["multiprocess"].append(time.perf_counter() - start)
 
     # Median across iterations
-    medians = {
-        k: sorted(v)[len(v) // 2] for k, v in results.items()
-    }
+    medians = {k: sorted(v)[len(v) // 2] for k, v in results.items()}
 
     return medians

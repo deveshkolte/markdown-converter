@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import Optional
 
 
 def resolve_path(path: str) -> Path:
@@ -38,7 +37,7 @@ def validate_input_file(path: str | Path) -> Path:
     return p
 
 
-def output_path_for(input_path: Path, output_dir: Optional[str | Path] = None) -> Path:
+def output_path_for(input_path: Path, output_dir: str | Path | None = None) -> Path:
     """Derive the ``.md`` output path for a given input file.
 
     * Without *output_dir*: same directory as the input, same stem, ``.md`` suffix.
@@ -72,14 +71,8 @@ def find_files(directory: Path, recursive: bool = False) -> list[Path]:
     """
     exts = supported_extensions()
     if recursive:
-        return sorted(
-            p for p in directory.rglob("*")
-            if p.is_file() and p.suffix.lower() in exts
-        )
-    return sorted(
-        p for p in directory.glob("*")
-        if p.is_file() and p.suffix.lower() in exts
-    )
+        return sorted(p for p in directory.rglob("*") if p.is_file() and p.suffix.lower() in exts)
+    return sorted(p for p in directory.glob("*") if p.is_file() and p.suffix.lower() in exts)
 
 
 def supported_extensions() -> list[str]:

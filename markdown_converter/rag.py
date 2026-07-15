@@ -9,9 +9,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from . import vectordb
 from .logger import get_logger
 from .pipeline import run_pipeline
-from . import vectordb
 
 logger = get_logger()
 
@@ -43,10 +43,7 @@ def ingest_document(
         chunk_overlap=chunk_overlap,
     )
 
-    chunk_dicts = [
-        {"id": c.id, "text": c.text, "metadata": c.metadata}
-        for c in doc.chunks
-    ]
+    chunk_dicts = [{"id": c.id, "text": c.text, "metadata": c.metadata} for c in doc.chunks]
 
     doc_id = doc.metadata.title
     added = vectordb.add_document(doc_id, chunk_dicts, collection_name=collection_name)

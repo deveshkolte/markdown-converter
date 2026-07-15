@@ -17,8 +17,7 @@ class Chunker(ABC):
     """Abstract base for all chunking strategies."""
 
     @abstractmethod
-    def chunk(self, text: str, **metadata: Any) -> list[Chunk]:
-        ...
+    def chunk(self, text: str, **metadata: Any) -> list[Chunk]: ...
 
 
 class FixedSizeChunker(Chunker):
@@ -123,9 +122,7 @@ class RecursiveChunker(Chunker):
                 buffer = candidate
             else:
                 if buffer:
-                    chunks.append(
-                        Chunk.create(buffer, strategy="recursive", **metadata)
-                    )
+                    chunks.append(Chunk.create(buffer, strategy="recursive", **metadata))
                 buffer = part
 
         if buffer:
@@ -135,9 +132,7 @@ class RecursiveChunker(Chunker):
 
     def _split_fixed(self, text: str, **metadata: Any) -> list[Chunk]:
         """Fallback: split at character level."""
-        return FixedSizeChunker(self.chunk_size, self.chunk_overlap).chunk(
-            text, **metadata
-        )
+        return FixedSizeChunker(self.chunk_size, self.chunk_overlap).chunk(text, **metadata)
 
 
 class SemanticChunker(Chunker):
@@ -159,9 +154,7 @@ class SemanticChunker(Chunker):
 
     def __init__(self, max_chunk_size: int = 2000) -> None:
         self.max_chunk_size = max_chunk_size
-        self._fallback = RecursiveChunker(
-            chunk_size=max_chunk_size, chunk_overlap=100
-        )
+        self._fallback = RecursiveChunker(chunk_size=max_chunk_size, chunk_overlap=100)
         self._heading_pattern = re.compile(r"^(#{1,6})\s+(.+)$", re.MULTILINE)
 
     def chunk(self, text: str, **metadata: Any) -> list[Chunk]:
@@ -175,9 +168,7 @@ class SemanticChunker(Chunker):
             section_meta = {**metadata, "section": section_heading or "root"}
 
             if len(section_text) <= self.max_chunk_size:
-                chunks.append(
-                    Chunk.create(section_text, strategy="semantic", **section_meta)
-                )
+                chunks.append(Chunk.create(section_text, strategy="semantic", **section_meta))
             else:
                 # Oversized section — sub-chunk recursively
                 sub_chunks = self._fallback._chunk_recursive(
@@ -190,9 +181,7 @@ class SemanticChunker(Chunker):
 
         return chunks
 
-    def _split_by_headings(
-        self, text: str
-    ) -> list[tuple[str | None, str]]:
+    def _split_by_headings(self, text: str) -> list[tuple[str | None, str]]:
         """Split text at heading boundaries.
 
         Returns:
@@ -207,7 +196,6 @@ class SemanticChunker(Chunker):
         prev_start = 0
 
         for i, match in enumerate(matches):
-            heading = match.group(0).strip()
             start = match.start()
             if i > 0:
                 prev_end = matches[i - 1].end()
@@ -239,8 +227,7 @@ def get_chunker(
     cls = strategy_map.get(strategy)
     if cls is None:
         raise ValueError(
-            f"Unknown chunking strategy {strategy!r}. "
-            f"Choose from: {', '.join(strategy_map)}"
+            f"Unknown chunking strategy {strategy!r}. " f"Choose from: {', '.join(strategy_map)}"
         )
 
     if strategy == "semantic":

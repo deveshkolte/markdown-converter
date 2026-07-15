@@ -8,11 +8,9 @@ from __future__ import annotations
 
 import argparse
 import sys
-import time
 from pathlib import Path
 from typing import Any
 
-from . import vectordb
 from .benchmark import run_benchmark
 from .converter import convert
 from .logger import get_logger, set_level
@@ -21,7 +19,6 @@ from .utils import find_files, output_path_for, validate_input_file
 
 try:
     from rich.console import Console
-    from rich.table import Table
 
     HAS_RICH = True
     console = Console()
@@ -73,29 +70,40 @@ def build_parser() -> argparse.ArgumentParser:
     p_pipe = sub.add_parser("pipeline", help="Full AI preprocessing pipeline")
     p_pipe.add_argument("input", type=str, help="Document to process")
     p_pipe.add_argument("-o", "--output", type=str, default=None, help="Output JSON path")
-    p_pipe.add_argument("--chunk-strategy", default="recursive",
-                        choices=["fixed", "recursive", "semantic"],
-                        help="Chunking strategy (default: recursive)")
+    p_pipe.add_argument(
+        "--chunk-strategy",
+        default="recursive",
+        choices=["fixed", "recursive", "semantic"],
+        help="Chunking strategy (default: recursive)",
+    )
     p_pipe.add_argument("--chunk-size", type=int, default=1000, help="Chunk size in chars")
     p_pipe.add_argument("--chunk-overlap", type=int, default=200, help="Chunk overlap in chars")
 
     # ── rag ───────────────────────────────────────────────────────────────
     p_rag = sub.add_parser("rag", help="Ask questions about a document (RAG)")
     p_rag.add_argument("input", type=str, help="Document to ingest and query")
-    p_rag.add_argument("question", type=str, nargs="?", default=None,
-                       help="Question to ask (omit for interactive mode)")
-    p_rag.add_argument("--model", default="openai/gpt-4o-mini",
-                       help="OpenRouter model (default: openai/gpt-4o-mini)")
-    p_rag.add_argument("--chunk-strategy", default="recursive",
-                       choices=["fixed", "recursive", "semantic"])
+    p_rag.add_argument(
+        "question",
+        type=str,
+        nargs="?",
+        default=None,
+        help="Question to ask (omit for interactive mode)",
+    )
+    p_rag.add_argument(
+        "--model",
+        default="openai/gpt-4o-mini",
+        help="OpenRouter model (default: openai/gpt-4o-mini)",
+    )
+    p_rag.add_argument(
+        "--chunk-strategy", default="recursive", choices=["fixed", "recursive", "semantic"]
+    )
     p_rag.add_argument("--chunk-size", type=int, default=1000)
     p_rag.add_argument("--chunk-overlap", type=int, default=200)
 
     # ── benchmark ─────────────────────────────────────────────────────────
     p_bench = sub.add_parser("benchmark", help="Benchmark conversion performance")
     p_bench.add_argument("input", type=str, help="Directory with test documents")
-    p_bench.add_argument("--iterations", type=int, default=1,
-                         help="Number of benchmark rounds")
+    p_bench.add_argument("--iterations", type=int, default=1, help="Number of benchmark rounds")
 
     return parser
 
@@ -289,7 +297,7 @@ def handle_rag(args: argparse.Namespace, logger: Any) -> int:
     return 0
 
 
-def handle_benchmark(args: argparse.Namespace, logger: Any) -> int:
+def handle_benchmark(args: argparse.Namespace) -> int:
     """Benchmark conversion performance."""
     results = run_benchmark(args.input, iterations=args.iterations)
 
@@ -327,9 +335,7 @@ def main(argv: list[str] | None = None) -> int:
     logger = _setup(args)
 
     try:
-        if mode == "legacy":
-            return handle_file(args, logger)
-        elif mode == "file":
+        if mode == "legacy" or mode == "file":
             return handle_file(args, logger)
         elif mode == "folder":
             return handle_folder(args, logger)
@@ -338,7 +344,7 @@ def main(argv: list[str] | None = None) -> int:
         elif mode == "rag":
             return handle_rag(args, logger)
         elif mode == "benchmark":
-            return handle_benchmark(args, logger)
+            return handle_benchmark(args)
         else:
             logger.error("Unknown command: %s", mode)
             return 1

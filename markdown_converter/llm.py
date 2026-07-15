@@ -79,8 +79,12 @@ def ask(
         "max_tokens": max_tokens,
     }
 
-    logger.debug("LLM request: model=%s, system=%d chars, user=%d chars",
-                  model, len(system_prompt), len(user_prompt))
+    logger.debug(
+        "LLM request: model=%s, system=%d chars, user=%d chars",
+        model,
+        len(system_prompt),
+        len(user_prompt),
+    )
 
     try:
         response = client.post("/chat/completions", json=payload)
@@ -110,8 +114,7 @@ def ask_with_context(
         The model's answer with citations.
     """
     context_text = "\n\n---\n\n".join(
-        f"[Chunk {i+1}] {c['text']}"
-        for i, c in enumerate(context_chunks)
+        f"[Chunk {i+1}] {c['text']}" for i, c in enumerate(context_chunks)
     )
 
     system_prompt = (

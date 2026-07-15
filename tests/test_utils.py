@@ -1,7 +1,6 @@
 """Unit tests for the markdown_converter package."""
 
 from pathlib import Path
-from typing import Generator
 
 import pytest
 

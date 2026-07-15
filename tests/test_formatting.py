@@ -48,7 +48,7 @@ class TestHeadingConversion:
         assert "## Education" in result
 
         lines = result.split("\n")
-        edu_idx = next(i for i, l in enumerate(lines) if "## Education" in l)
+        edu_idx = next(i for i, _ in enumerate(lines) if "## Education" in _)
         assert lines[edu_idx - 1].strip() == ""
         assert lines[edu_idx + 1].strip() == ""
 

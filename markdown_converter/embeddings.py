@@ -45,9 +45,7 @@ def _get_embedding_function() -> Any:
         _embedding_function = ONNXMiniLM_L6_V2(preferred_providers=["CPUExecutionProvider"])
         logger.debug("Initialised ONNXMiniLM_L6_V2 embedding function")
     except ImportError:
-        logger.warning(
-            "chromadb not installed. Install with: pip install markdown-converter[rag]"
-        )
+        logger.warning("chromadb not installed. Install with: pip install markdown-converter[rag]")
         _embedding_function = None
 
     return _embedding_function

@@ -5,7 +5,6 @@ Provides both the core timing logic and a pretty-printed summary table.
 
 from __future__ import annotations
 
-import time
 from pathlib import Path
 from typing import Any
 
@@ -80,7 +79,11 @@ def _format_table(rows: list[tuple[str, float, float]]) -> str:
             table.add_row(name, f"{duration:.2f}s", f"{speedup:.2f}x")
         console.print(table)
         # Also return a string version
-        out = f"Benchmark: {rows[0][1]:.2f}s sequential → {rows[1][1]:.2f}s threaded → {rows[2][1]:.2f}s multiprocess"
+        out = (
+            f"Benchmark: {rows[0][1]:.2f}s sequential"
+            f" → {rows[1][1]:.2f}s threaded"
+            f" → {rows[2][1]:.2f}s multiprocess"
+        )
         return out
     else:
         lines = [f"{'Method':<20} {'Duration':>10} {'Speed-up':>10}"]

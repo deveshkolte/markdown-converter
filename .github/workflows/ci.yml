@@ -36,7 +36,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
       - run: pip install -e ".[dev]"
-      - run: pytest tests/ --cov --cov-report=xml
+      - run: pytest tests/ api/ --cov --cov-report=xml
       - uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml

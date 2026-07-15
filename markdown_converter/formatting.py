@@ -36,7 +36,6 @@ _SECTION_TITLES = {
 def clean_markdown(text: str) -> str:
     lines = text.split("\n")
     result: list[str] = []
-    n = len(lines)
 
     for i, line in enumerate(lines):
         raw = line
@@ -44,9 +43,8 @@ def clean_markdown(text: str) -> str:
         raw = _replace_bullets(raw)
 
         prev_blank = i == 0 or lines[i - 1].strip() == ""
-        next_blank = i == n - 1 or lines[i + 1].strip() == ""
 
-        raw = _maybe_heading(raw, prev_blank, next_blank)
+        raw = _maybe_heading(raw, prev_blank)
 
         raw = raw.replace("\x0c", "")
 
@@ -57,10 +55,7 @@ def clean_markdown(text: str) -> str:
     return "\n".join(result)
 
 
-_BULLET_CHARS = (
-    "\u2022\u2023\u2043\u25CB\u25CF\u25D8\u25D9"
-    "\u25E6\u25A0\u25AA\u25B6\u25C6\u25D0"
-)
+_BULLET_CHARS = "\u2022\u2023\u2043\u25cb\u25cf\u25d8\u25d9" "\u25e6\u25a0\u25aa\u25b6\u25c6\u25d0"
 
 
 def _replace_bullets(line: str) -> str:
@@ -83,7 +78,7 @@ def _replace_bullets(line: str) -> str:
     return line
 
 
-def _maybe_heading(line: str, prev_blank: bool, next_blank: bool) -> str:
+def _maybe_heading(line: str, prev_blank: bool) -> str:
     stripped = line.strip()
     if not stripped:
         return line
