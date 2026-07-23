@@ -27,13 +27,12 @@ ALLOWED_EXTENSIONS = {
 
 MAX_FILE_SIZE = 50 * 1024 * 1024
 
-# Allow all origins.
-# TODO: Before going live, uncomment the env-var logic below and set
-#       ALLOWED_ORIGINS on Render to the real frontend domain.
+# Allow all origins (no credentials — frontend sends plain fetch without cookies).
+# TODO: Before going live lock down `allow_origins` to the real frontend domain
+#       (e.g. ["https://markdown-converter.vercel.app"]).
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
