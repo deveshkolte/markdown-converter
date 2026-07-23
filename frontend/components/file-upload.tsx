@@ -97,7 +97,7 @@ export function FileUpload({ onConvert }: FileUploadProps) {
       setColdStart(true);
     }, 5_000);
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
     const formData = new FormData();
     formData.append("file", file);
 
