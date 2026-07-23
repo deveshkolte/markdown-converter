@@ -97,7 +97,12 @@ export function FileUpload({ onConvert }: FileUploadProps) {
       setColdStart(true);
     }, 5_000);
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!apiUrl) {
+      setError("Configuration error: NEXT_PUBLIC_API_URL is not set.");
+      setIsUploading(false);
+      return;
+    }
     const formData = new FormData();
     formData.append("file", file);
 
@@ -106,15 +111,28 @@ export function FileUpload({ onConvert }: FileUploadProps) {
         method: "POST",
         body: formData,
       });
-      const result = await response.json();
-
-      if (result.markdown) {
-        onConvert({ markdown: result.markdown, fileName: file.name });
-      } else {
-        onConvert({ error: result.error ?? "Conversion failed" });
+      let body: string | null = null;
+      let result: Record<string, unknown> | null = null;
+      try {
+        body = await response.text();
+        result = JSON.parse(body);
+      } catch {
+        // response not JSON or empty
       }
-    } catch {
-      setError("Upload failed. Please try again.");
+
+      if (result?.markdown) {
+        onConvert({ markdown: result.markdown as string, fileName: file.name });
+      } else {
+        const msg = (result?.error as string) ?? body ?? response.statusText ?? "Conversion failed";
+        onConvert({ error: msg });
+      }
+    } catch (err) {
+      console.error("[UPLOAD]", err);
+      setError(
+        err instanceof TypeError
+          ? "Network error — could not reach the conversion server."
+          : `Upload failed: ${(err as Error).message}`,
+      );
     } finally {
       setIsUploading(false);
       setColdStart(false);

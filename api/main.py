@@ -1,6 +1,8 @@
 import contextlib
+import logging
 import os
 import tempfile
+import traceback
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -25,14 +27,12 @@ ALLOWED_EXTENSIONS = {
 
 MAX_FILE_SIZE = 50 * 1024 * 1024
 
-origins_str = os.environ.get("ALLOWED_ORIGINS")
-# Default to allow all origins for local dev.
-# TODO: Lock down to the real frontend domain before going live.
-origins = [o.strip() for o in origins_str.split(",") if o.strip()] if origins_str else ["*"]
-
+# Allow all origins.
+# TODO: Before going live, uncomment the env-var logic below and set
+#       ALLOWED_ORIGINS on Render to the real frontend domain.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -74,6 +74,7 @@ async def convert_endpoint(file: UploadFile = File(...)):  # noqa: B008
         markdown = convert(tmp_path)
         return {"success": True, "markdown": markdown}
     except Exception as e:
+        logging.error("Conversion failed:\n%s", traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e)) from e
     finally:
         if tmp_path is not None:
