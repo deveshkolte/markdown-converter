@@ -2,197 +2,193 @@
 
 # Markdown Converter
 
-**Convert documents → Markdown → AI-ready chunks → Semantic search + LLM queries**
+**Convert PDF, DOCX, PPTX, XLSX, and more to clean Markdown.**
 
-*Powered by Microsoft MarkItDown · ChromaDB · OpenRouter*
+Engineered for LLM workflows, RAG pipelines, and documentation automation.
 
+[![Live Demo](https://img.shields.io/badge/demo-markitdown--web.vercel.app-blue?style=flat&logo=vercel)](https://markitdown-web.vercel.app)
+[![API](https://img.shields.io/badge/API-markdown--converter--0jsu.onrender.com-green?style=flat&logo=render)](https://markdown-converter-0jsu.onrender.com/docs)
 [![CI](https://github.com/deveshkolte/markdown-converter/actions/workflows/ci.yml/badge.svg)](https://github.com/deveshkolte/markdown-converter/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 </div>
 
 ---
 
-## Features
+## Live Demo
 
-| Capability | Command | Description |
+Try the web app without installing anything:
+
+**→ [markitdown-web.vercel.app](https://markitdown-web.vercel.app)**
+
+Drag-and-drop a document and get clean Markdown in seconds. Powered by the FastAPI backend on Render.
+
+---
+
+## What This Is
+
+Two things in one repo:
+
+| Layer | Stack | Deployed At |
 |---|---|---|
-| **Convert** | `mdconvert file doc.pdf` | Single document → Markdown |
-| **Batch** | `mdconvert folder ./docs` | Entire directory → Markdown files |
-| **Pipeline** | `mdconvert pipeline doc.pdf` | Document → Chunks → JSON |
-| **Query** | `mdconvert rag doc.pdf "summarize"` | Ask questions about a document |
-| **Benchmark** | `mdconvert benchmark ./docs` | Compare sequential vs concurrent speed |
+| **Python SDK** | MarkItDown + ChromaDB + OpenRouter | `pip install markdown-converter` |
+| **Web API** | FastAPI + Uvicorn | [`docs`](https://markdown-converter-0jsu.onrender.com/docs) |
+| **Web UI** | Next.js 16 + Tailwind + shadcn/ui | [`markitdown-web.vercel.app`](https://markitdown-web.vercel.app) |
 
-### AI Pipeline (end-to-end)
+---
+
+## Web UI
+
+A drag-and-drop interface that calls the FastAPI backend:
 
 ```
-Document ──→ MarkItDown ──→ Markdown ──→ Chunker ──→ Embeddings ──→ Vector DB ──→ LLM
-                                                                          │
-                                                                     "What does this say?"
+Drop a file ──→ Upload to /convert ──→ FastAPI parses with MarkItDown ──→ Clean Markdown
 ```
 
-## Quick Start
+### Supported Formats
+
+| Category | Formats |
+|---|---|
+| Documents | PDF, DOCX, PPTX, XLSX |
+| Web | HTML, EPUB, CSV |
+| Code | MD, TXT |
+
+---
+
+## API
+
+**Base URL:** `https://markdown-converter-0jsu.onrender.com`
+
+### Convert a file
+
+```
+POST /convert
+Content-Type: multipart/form-data
+
+file: <binary>
+```
+
+**Example:**
 
 ```bash
-# Install
-python3 -m venv venv && source venv/bin/activate
-pip install markdown-converter
-
-# Convert a document
-mdconvert file resume.pdf
-
-# Run the full AI pipeline
-mdconvert pipeline resume.pdf
-
-# Ask questions about a document
-mdconvert rag resume.pdf "What are the key skills?"
+curl -X POST https://markdown-converter-0jsu.onrender.com/convert \
+  -F "file=@resume.pdf"
 ```
 
-## Installation
+**Response:**
 
-### From PyPI (coming soon)
-
-```bash
-pip install markdown-converter
+```json
+{
+  "success": true,
+  "markdown": "# Resume\n\n..."
+}
 ```
 
-### From source
+### Health check
+
+```
+GET /health
+```
+
+### Interactive docs
+
+Open [the Swagger UI](https://markdown-converter-0jsu.onrender.com/docs) to test endpoints from the browser.
+
+---
+
+## Python SDK
+
+Install from source:
 
 ```bash
 git clone https://github.com/deveshkolte/markdown-converter.git
 cd markdown-converter
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv venv && source venv/bin/activate
 pip install -e ".[dev,rag]"
 ```
 
-## Usage
+### CLI Commands
 
-### Convert a single file
+| Command | Description |
+|---|---|
+| `mdconvert file doc.pdf` | Single document → Markdown |
+| `mdconvert folder ./docs` | Entire directory → Markdown files |
+| `mdconvert pipeline doc.pdf` | Document → Chunks → JSON |
+| `mdconvert rag doc.pdf "summarize"` | Ask questions about a document |
+| `mdconvert benchmark ./docs` | Compare sequential vs concurrent speed |
+
+### Examples
 
 ```bash
 mdconvert file resume.pdf
-mdconvert file notes.docx -o ./output
-mdconvert file slides.pptx --overwrite
-```
-
-### Convert a folder
-
-```bash
-mdconvert folder ./documents
 mdconvert folder ./documents -o ./markdown
-mdconvert folder ./documents --recursive
-```
-
-### AI Preprocessing Pipeline
-
-```bash
-# Full pipeline: convert → chunk → embed → save JSON
-mdconvert pipeline resume.pdf
-
-# With custom chunking
 mdconvert pipeline document.pdf --chunk-size 500 --chunk-overlap 50
-
-# Output path
-mdconvert pipeline notes.docx -o ./pipeline-output.json
+mdconvert rag report.docx "What are the key findings?"
 ```
 
-The pipeline outputs structured JSON:
+### Pipeline Output
 
 ```json
 {
   "title": "Resume.pdf",
-  "file_type": "pdf",
-  "word_count": 482,
   "markdown": "# DEVESH KOLTE\n\n...",
   "chunks": [
     {
       "id": "chunk_0001",
       "text": "DEVESH KOLTE\n\nEducation...",
-      "metadata": { "page": 1, "section": "header" },
       "embedding": [0.012, -0.034, ...]
     }
   ]
 }
 ```
 
-### RAG — Ask Questions
+---
 
-```bash
-# Requires OPENROUTER_API_KEY environment variable
-export OPENROUTER_API_KEY="sk-..."
-
-mdconvert rag resume.pdf "Summarize this document"
-mdconvert rag report.docx "What are the key findings?"
-mdconvert rag presentation.pptx "List all bullet points"
-```
-
-### Benchmark
-
-```bash
-mdconvert benchmark ./documents
-```
-
-Output:
+## RAG Pipeline
 
 ```
-Method           Duration    Speed-up
-─────────────────────────────────────
-Sequential        12.34s      1.00x
-Threaded           4.56s      2.71x
-Multiprocess       3.21s      3.84x
+Document ──→ MarkItDown ──→ Chunker ──→ Embedder ──→ ChromaDB ──→ LLM (OpenRouter)
 ```
 
-## Chunking Strategies
+Components:
 
-| Strategy | Description |
+| Component | Technology |
 |---|---|
-| **Fixed-size** | Split by character count with configurable overlap |
-| **Recursive** | Split by paragraphs → sentences → characters (LLM-friendly) |
-| **Semantic** | Split by Markdown headings and natural boundaries |
+| Conversion | Microsoft MarkItDown |
+| Chunking | Fixed-size / Recursive / Semantic |
+| Embeddings | all-MiniLM-L6-v2 (ONNX, 384-d) |
+| Vector DB | ChromaDB (local, persistent) |
+| LLM | OpenRouter (200+ models) |
 
-## RAG Architecture
-
-```
-┌──────────────┐    ┌─────────────┐    ┌──────────────┐
-│  Document    │───→│  MarkItDown  │───→│  Chunker     │
-└──────────────┘    └─────────────┘    └──────┬───────┘
-                                              │
-                                              ▼
-┌──────────────┐    ┌─────────────┐    ┌──────────────┐
-│  LLM Answer  │←───│  Vector DB  │←───│  Embedder    │
-│  (OpenRouter)│    │  (ChromaDB) │    │  (MiniLM-L6) │
-└──────────────┘    └─────────────┘    └──────────────┘
-```
-
-**Embedding model**: `all-MiniLM-L6-v2` — 384-dimensional, runs locally via ONNX, no GPU needed. Strong for semantic search while being 5× faster than BERT-based models.
-
-**Vector database**: ChromaDB — local, persistent, zero-config. Stores embeddings + metadata + original text.
-
-**LLM**: OpenRouter — unified API for 200+ models. Use any model (GPT-4, Claude, Gemini, Llama) with a single key.
+---
 
 ## Project Structure
 
 ```
-markdown_converter/
-├── __init__.py         # Public API exports
-├── cli.py              # Argparse CLI with subcommands
-├── logger.py           # Singleton logger with level control
-├── utils.py            # Path validation, file discovery, output paths
-├── converter.py        # MarkItDown wrapper (lazy singleton)
-├── models.py           # Document, Chunk, Metadata dataclasses
-├── chunking.py         # Fixed, recursive, and semantic chunkers
-├── pipeline.py         # End-to-end preprocessing pipeline
-├── worker.py           # ThreadPoolExecutor, caching, concurrent processing
-├── embeddings.py       # Embedding model wrapper (MiniLM-L6-v2 via ONNX)
-├── vectordb.py         # ChromaDB client (local, persistent)
-├── llm.py              # OpenRouter API client
-├── rag.py              # RAG pipeline orchestrator
-└── benchmark.py        # Performance benchmarking
+markdown_converter/          ← Python package
+├── converter.py             MarkItDown wrapper
+├── cli.py                  Argparse CLI
+├── pipeline.py             Conversion + chunking + embedding pipeline
+├── chunking.py             Fixed, recursive, semantic chunkers
+├── embeddings.py           MiniLM-L6-v2 via ONNX
+├── vectordb.py             ChromaDB client
+├── llm.py                  OpenRouter API client
+├── rag.py                  RAG orchestrator
+├── worker.py               Concurrent processing
+└── benchmark.py            Performance benchmarks
+
+api/                         ← FastAPI service
+├── main.py
+└── requirements.txt
+
+frontend/                    ← Next.js web UI
+├── app/
+├── components/
+└── vercel.json
 ```
+
+---
 
 ## Development
 
@@ -203,25 +199,24 @@ pytest tests/ --cov
 ruff check .
 ```
 
-## Supported Formats
-
-PDF, DOCX, PPTX, XLSX, CSV, HTML, EPUB, images (OCR), audio (transcription),
-Jupyter Notebooks, Outlook .msg files, ZIP archives, YouTube transcripts,
-Wikipedia articles, RSS feeds.
+---
 
 ## Roadmap
 
-- [x] Document → Markdown conversion
+- [x] Document → Markdown conversion (CLI)
 - [x] Folder batch processing
 - [x] AI preprocessing pipeline (chunking, embeddings, metadata)
 - [x] RAG with vector DB and LLM
 - [x] Benchmark mode
 - [x] CI/CD, linting, pre-commit
+- [x] **Web API (FastAPI)**
+- [x] **Web UI (Next.js)**
 - [ ] Desktop UI (PySide6)
-- [ ] Web UI (Next.js + FastAPI)
 - [ ] Multi-document RAG
 - [ ] Streaming responses
 - [ ] PDF OCR for scanned documents
+
+---
 
 ## License
 

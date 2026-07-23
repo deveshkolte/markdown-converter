@@ -1,29 +1,21 @@
-# Markdown Converter API
+# FastAPI Backend
 
-FastAPI wrapper around the `markdown_converter` Python package. Replaces the Next.js `execFile` pattern with an in-process import — no subprocess overhead.
+Deployed at `https://markdown-converter-0jsu.onrender.com`.
 
-## Run locally
+## Local dev
 
 ```bash
-# From the project root (~/markdown_converter/)
 pip install -r api/requirements.txt
 uvicorn api.main:app --reload --port 8000
 ```
 
-The API is available at `http://localhost:8000`.
+API at `http://localhost:8000`. Swagger UI at `http://localhost:8000/docs`.
 
-- **Health check**: `GET /health` → `{"status": "ok"}`
-- **Convert**: `POST /convert` with a `multipart/form-data` file field
+## Endpoints
 
-## Deploy to Render
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/health` | Health check |
+| `POST` | `/convert` | Upload file → Markdown (multipart/form-data, field: `file`) |
 
-1. Push the repo (the `api/` subfolder is part of the `markdown-converter` repo).
-2. In the Render dashboard, create a **New Web Service** and connect your repo.
-3. Render will auto-detect `render.yaml` in the root. Alternatively, manually configure:
-   - **Build Command**: `pip install -r api/requirements.txt`
-   - **Start Command**: `uvicorn api.main:app --host 0.0.0.0 --port $PORT`
-   - **Health Check Path**: `/health`
-
-### Cold starts
-
-The Render free tier spins down after 15 minutes of inactivity. The first request after idle will take 30–60 seconds to cold-start.
+See [root README](/README.md#api) for full API docs.
