@@ -31,7 +31,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "https://markdown-converter.vercel.app",
+        "https://markitdown-web.vercel.app",
     ],
     allow_methods=["*"],
     allow_headers=["*"],
