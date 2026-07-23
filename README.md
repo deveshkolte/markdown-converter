@@ -8,9 +8,13 @@ Engineered for LLM workflows, RAG pipelines, and documentation automation.
 
 [![Live Demo](https://img.shields.io/badge/demo-markitdown--web.vercel.app-blue?style=flat&logo=vercel)](https://markitdown-web.vercel.app)
 [![API](https://img.shields.io/badge/API-markdown--converter--0jsu.onrender.com-green?style=flat&logo=render)](https://markdown-converter-0jsu.onrender.com/docs)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=fff)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=fff)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=fff)](https://nextjs.org/)
+[![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=fff)](https://vercel.com)
+[![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=000)](https://render.com)
 [![CI](https://github.com/deveshkolte/markdown-converter/actions/workflows/ci.yml/badge.svg)](https://github.com/deveshkolte/markdown-converter/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?logo=github)](LICENSE)
 
 </div>
 
@@ -37,6 +41,46 @@ Two things in one repo:
 | **Web UI** | Next.js 16 + Tailwind + shadcn/ui | [`markitdown-web.vercel.app`](https://markitdown-web.vercel.app) |
 
 ---
+
+## Architecture
+
+```
+                         ┌─────────────────────┐
+                         │     User (Browser)   │
+                         └──────────┬──────────┘
+                                    │
+                              drag & drop
+                                    │
+                                    ▼
+                    ┌───────────────────────────────┐
+                    │    Next.js 16 (Vercel)        │
+                    │  markitdown-web.vercel.app    │
+                    └──────────┬────────────────────┘
+                               │
+                         POST /convert
+                     multipart/form-data
+                               │
+                               ▼
+                    ┌───────────────────────────────┐
+                    │    FastAPI (Render)           │
+                    │  markdown-converter-0jsu      │
+                    │  .onrender.com                │
+                    └──────────┬────────────────────┘
+                               │
+                         MarkItDown
+                               │
+                               ▼
+                    ┌───────────────────────────────┐
+                    │    Formatting Pipeline        │
+                    │  (heading, list, table,       │
+                    │   code block normalizers)     │
+                    └──────────┬────────────────────┘
+                               │
+                               ▼
+                    ┌───────────────────────────────┐
+                    │         Markdown              │
+                    └───────────────────────────────┘
+```
 
 ## Web UI
 
